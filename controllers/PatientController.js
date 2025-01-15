@@ -7,7 +7,10 @@ class PatientController {
         console.error("Database error:", err);
         return res.status(500).json({ error: "Database error: " + err.message });
       }
-      res.status(200).json({ data: results });
+      if (!results.length) {
+        return res.status(204).json({ message: "Data is empty" });
+      }
+      res.status(200).json({ message: "Get All Resource", data: results });
     });
   }
 
@@ -28,7 +31,7 @@ class PatientController {
   static createPatient(req, res) {
     const { name, phone, address, status, in_date_at, out_date_at } = req.body;
     if (!name || !phone || !address || !status || !in_date_at) {
-      return res.status(400).json({ message: "Please provide all required fields" });
+      return res.status(422).json({ message: "All fields must be filled correctly" });
     }
     const newPatient = { name, phone, address, status, in_date_at, out_date_at: out_date_at || null };
     Patient.createPatient(newPatient, (err, result) => {
@@ -36,7 +39,7 @@ class PatientController {
         console.error("Database error:", err);
         return res.status(500).json({ error: "Database error: " + err.message });
       }
-      res.status(201).json({ message: "Berhasil menambahkan data pasien", id: result.insertId });
+      res.status(201).json({ message: "Resource is added successfully", data: { id: result.insertId } });
     });
   }
 
@@ -44,7 +47,7 @@ class PatientController {
     const { id } = req.params;
     const { name, phone, address, status, in_date_at, out_date_at } = req.body;
     if (!name || !phone || !address || !status || !in_date_at) {
-      return res.status(400).json({ message: "Please provide all required fields" });
+      return res.status(422).json({ message: "All fields must be filled correctly" });
     }
     const updatedPatient = { name, phone, address, status, in_date_at, out_date_at };
     Patient.updatePatient(id, updatedPatient, (err, result) => {
@@ -55,7 +58,7 @@ class PatientController {
       if (result.affectedRows === 0) {
         return res.status(404).json({ message: "Patient not found" });
       }
-      res.status(200).json({ message: "Patient updated successfully" });
+      res.status(200).json({ message: "Resource is update successfully", data: updatedPatient });
     });
   }
 
@@ -69,9 +72,10 @@ class PatientController {
       if (result.affectedRows === 0) {
         return res.status(404).json({ message: "Patient not found" });
       }
-      res.status(200).json({ message: "Patient deleted successfully" });
+      res.status(200).json({ message: "Resource is delete successfully" });
     });
   }
+
   static searchPatientByName(req, res) {
     const { name } = req.params;
     Patient.searchPatientByName(name, (err, results) => {
@@ -86,34 +90,40 @@ class PatientController {
     });
   }
 
-  // Method untuk mendapatkan pasien dengan status 'Positive'
   static getPositivePatients(req, res) {
     Patient.getPatientsByStatus("Positive", (err, results) => {
       if (err) {
         console.error("Database error:", err);
         return res.status(500).json({ error: "Database error: " + err.message });
       }
+      if (!results.length) {
+        return res.status(204).json({ message: "Data is empty" });
+      }
       res.status(200).json({ data: results });
     });
   }
 
-  // Method untuk mendapatkan pasien dengan status 'Recovered'
   static getRecoveredPatients(req, res) {
     Patient.getPatientsByStatus("Recovered", (err, results) => {
       if (err) {
         console.error("Database error:", err);
         return res.status(500).json({ error: "Database error: " + err.message });
       }
+      if (!results.length) {
+        return res.status(204).json({ message: "Data is empty" });
+      }
       res.status(200).json({ data: results });
     });
   }
 
-  // Method untuk mendapatkan pasien dengan status 'Dead'
   static getDeadPatients(req, res) {
     Patient.getPatientsByStatus("Dead", (err, results) => {
       if (err) {
         console.error("Database error:", err);
         return res.status(500).json({ error: "Database error: " + err.message });
+      }
+      if (!results.length) {
+        return res.status(204).json({ message: "Data is empty" });
       }
       res.status(200).json({ data: results });
     });
