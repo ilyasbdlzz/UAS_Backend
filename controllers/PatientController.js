@@ -36,7 +36,7 @@ class PatientController {
         console.error("Database error:", err);
         return res.status(500).json({ error: "Database error: " + err.message });
       }
-      res.status(201).json({ message: "Patient created successfully", id: result.insertId });
+      res.status(201).json({ message: "Berhasil menambahkan data pasien", id: result.insertId });
     });
   }
 
